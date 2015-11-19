@@ -23,7 +23,8 @@
 <div id="plot"> </div>
 <div id="experiment"> 
 <button id="refreshPlot">Refresh Plot</button>
-<button id="annotations">Turn off annotations</button>
+<button id="annotations">Turn on annotations</button>
+<button id="weatherRange">Past 7 days weather</button>
 </div>
 
 <!--
@@ -123,66 +124,31 @@ layout = {                     // all "layout" attributes: #layout
     ]
 
 }
-console.log(layout);
+//console.log(layout);
 var server = 'http://14.139.34.32:8080/';
 var public_key = 'v02NOaq1KKhpYLJqJ9EWFq1N8QqE';
 // var timezone = '?timezone=Asia/Calcutta';
 
+
 // JSONP request
-var jsonData = $.ajax({
-  // url: 'http://14.139.34.32:8080/output/' + public_key + '.json' + timezone,
-  url: server + 'output/' + public_key + '.json',
-  //data: {page: 1},
-  dataType: 'jsonp',
-}).done(function (results) {
-    console.log(results);
-    var i;
-    for(i=0; i<5; i++) {
-        console.log(results[i]);
-    }
-    data[0].x = _.map(results, function(item) {
-            return item.timestamp.replace('T', ' ').replace('Z', ''); // Convert to Plotly time format
-        });
-    data[1].x = data[0].x;      // Both plots have same time scale
-    data[0].y = _.map(results, function(item) {  // Copy temp data
-        if(item.temp < 50) {
-            return item.temp;
-        } else {
-            return NaN;
-        }
-    });
-    data[1].y = _.map(results, function(item) { // Copy pressure data
-        if(item.pressure > 880 && item.pressure < 920) {
-            return item.pressure;
-        } else {
-            return NaN;
-        }
-    });
-    // console.log(data[0].x.length);
-    
-    Plotly.plot('plot', data, layout);      // Puts plot in <div> with id='plot'
-    $('#summary').html('Temp: ' + data[0].y[0] + '(C), Pressure: ' + data[1].y[0] +
-        ' at ' + data[0].x[0]);
-});
-$(document).ready(function() {
-	$("#refreshPlot").click(function() {
-		console.log("Button is clicked");
-		var jsonData = $.ajax({
-		  // url: 'http://14.139.34.32:8080/output/' + public_key + '.json' + timezone,
-		  url: server + 'output/' + public_key + '.json',
-		   //data: {page: 1},
-		  dataType: 'jsonp',
-		}).done(function (results) {
-		    // console.log(results);
-		    // var i;
-		    // for(i=0; i<5; i++) {
-		    //     console.log(results[i]);
-		    // }
-		    console.log("Replacing div id plot");
+var annotations;
+function doneOutside(results) {
+		    console.log(results);
+/*		    var i;
+		    for(i=0; i<5; i++) {
+		        console.log(results[i]);
+		    }
+*/		    console.log("Replacing div id plot");
 		    $("#plot").replaceWith('<div id="plot"> </div>');
 		    console.log("Replaced div id plot");
 		    data[0].x = _.map(results, function(item) {
-		            return item.timestamp.replace('T', ' ').replace('Z', ''); // Convert to Plotly time format
+		            timestamp = item.timestamp.replace('T', ' ').replace('Z', ''); // Convert to Plotly time format
+//		            console.log("Inside _.map and timestamp is " + timestamp);
+		            var targetTime = new Date(timestamp);
+		            var tzDifference = targetTime.getTimezoneOffset();
+		            var offsetTime = new Date(targetTime.getTime() - tzDifference*60*1000);
+//		            console.log("Returning new Offset Time which is: " + offsetTime);
+		            return offsetTime;
 		        });
 		    data[1].x = data[0].x;      // Both plots have same time scale
 		    data[0].y = _.map(results, function(item) {  // Copy temp data
@@ -199,16 +165,60 @@ $(document).ready(function() {
 		            return NaN;
 		        }
 		    });
-		    // console.log(data[0].x.length);
-		    
+		    annotations = layout.annotations;
+		    delete layout.annotations;
 		    Plotly.plot('plot', data, layout);      // Puts plot in <div> with id='plot'
 		    $('#summary').html('Temp: ' + data[0].y[0] + '(C), Pressure: ' + data[1].y[0] +
-		        ' at ' + data[0].x[0]);
-		});
+		        ' at ' + data[0].x[0]);	
+}
+function AjaxRequest() {
+	var jsonData = $.ajax({
+		  // url: 'http://14.139.34.32:8080/output/' + public_key + '.json' + timezone,
+		  url: server + 'output/' + public_key + '.json?gt[timestamp]=now%20-1month', //Gets past 1 months data by default (now -30day)
+//		  data: {page : 1},
+		  dataType: 'jsonp',
+		}).done(function (results) {
+			doneOutside(results);
+		});	
+}
+AjaxRequest();
+$(document).ready(function() {
+	/*$("#refreshPlot").click(function() {
+//		console.log("Button is clicked");
+		AjaxRequest();		//Verified. It really updates the plot and the data at the top
 	});
-
-	var annotations = layout.annotations;
-	var flag = 0;
+*/
+	$("#refreshPlot").click(function() {
+		console.log("Button is clicked");
+		var jsonData = $.ajax({
+		  url: server + 'output/' + public_key + '/latest.json',
+		  dataType: 'jsonp',
+		}).done(function (results) {
+		    console.log(JSON.stringify(results));
+		    var timestamp = results[0].timestamp.replace('T', ' ').replace('Z', ''); // Convert to Plotly time format
+	        var targetTime = new Date(timestamp);
+	        var tzDifference = targetTime.getTimezoneOffset();
+	        var offsetTime = new Date(targetTime.getTime() - tzDifference*60*1000);
+	        if(offsetTime > data[0].x[0]) {
+	        	console.log("Replacing div id plot");
+			    $("#plot").replaceWith('<div id="plot"> </div>');
+			    console.log("Replaced div id plot");
+	        	console.log("New data plotting");
+	        	data[0].x.unshift(offsetTime);
+		        data[1].x.unshift(offsetTime);
+		        data[0].y.unshift(results[0].temp);
+		        data[1].y.unshift(results[0].pressure);
+				Plotly.plot('plot', data, layout);      // Puts plot in <div> with id='plot'
+			    $('#summary').html('Temp: ' + data[0].y[0] + '(C), Pressure: ' + data[1].y[0] +
+			        ' at ' + data[0].x[0]);	
+	        }
+	        else {
+	        	console.log("New data fetched is not new");
+	        }
+	        });
+	        
+	});
+	var flag = 1;
 	$("#annotations").click(function() {
 		if(flag == 0) {
 			flag = 1;
@@ -230,6 +240,37 @@ $(document).ready(function() {
 		    Plotly.plot('plot', data, layout);      // Puts plot in <div> with id='plot'
 		    $(this).text("Turn off annotations");
 		}
+	})
+	$("#weatherRange").click(function() {
+		//var newData = data.slice();
+		var newData = JSON.parse(JSON.stringify(data));
+		delete newData[0].x;
+		delete newData[0].y;
+		delete newData[1].x;
+		delete newData[1].y;
+		newData[0].x = [];
+		newData[0].y = [];
+		newData[1].x = [];
+		newData[1].y = [];
+		console.log(data[0].x);
+		var refTime = new Date();
+		refTime.setDate(refTime.getDate() - 2);
+		console.log("Reference Date is : " + refTime);
+		var x = Date.parse(refTime);
+		var j = 0;
+		for (var i = data[0].x.length - 1; i >= 0; i--) {
+			if(Date.parse(data[0].x[i]) >= x) {
+				newData[0].x[j] = data[0].x[i];
+				newData[0].y[j] = data[0].y[i];
+				newData[1].x[j] = data[1].x[i];
+				newData[1].y[j] = data[1].y[i];
+				j++;
+			}
+		};
+		console.log("Replacing div id plot");
+	    $("#plot").replaceWith('<div id="plot"> </div>');
+	    console.log("Replaced div id plot");
+	    Plotly.plot('plot', newData, layout);      // Puts plot in <div> with id='plot' 
 	})
 })
 </script>
