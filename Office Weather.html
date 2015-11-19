@@ -96,34 +96,15 @@ layout = {                     // all "layout" attributes: #layout
         tickfont: {color: 'rgb(148, 103, 189)'},
         overlaying: 'y',
         side: 'right'
-    },
-
-    annotations: [            // all "annotation" attributes: #layout-annotations
-	{
-            text: 'Rain',     // #layout-annotations-text
-            x:    '2015-09-16 12:09',    // #layout-annotations-x
-            xref: 'x',        // #layout-annotations-xref
-            y:    898.2,      // #layout-annotations-y
-            yref: 'y2'        // #layout-annotations-yref
-        },
-        {
-            text: 'Moved Outside',     // #layout-annotations-text
-            x:    '2015-10-07 11:15',    // #layout-annotations-x
-            xref: 'x',        // #layout-annotations-xref
-            y:    29.3,      // #layout-annotations-y
-            yref: ''        // #layout-annotations-yref
-        },
-        {
-            text: 'Fixed wiring',     // #layout-annotations-text
-            x:    '2015-10-14 3:28',    // #layout-annotations-x
-            xref: 'x',        // #layout-annotations-xref
-            y:    904.1,      // #layout-annotations-y
-            yref: 'y2'        // #layout-annotations-yref
-        }        
-
-    ]
-
+    }
+//Moved annotations to a separate file
 }
+$.get("http://10.8.7.44/annotations", function(response) { //Hosted on my localhost Needed to install CORS extension on chrome
+    var annotations = jQuery.parseJSON(response);
+    console.log("Loaded file: " + response);
+    layout.annotations = annotations;
+    console.log(layout);
+});
 //console.log(layout);
 var server = 'http://14.139.34.32:8080/';
 var public_key = 'v02NOaq1KKhpYLJqJ9EWFq1N8QqE';
@@ -133,7 +114,7 @@ var public_key = 'v02NOaq1KKhpYLJqJ9EWFq1N8QqE';
 // JSONP request
 var annotations;
 function doneOutside(results) {
-		    console.log(results);
+//		    console.log(results);
 /*		    var i;
 		    for(i=0; i<5; i++) {
 		        console.log(results[i]);
