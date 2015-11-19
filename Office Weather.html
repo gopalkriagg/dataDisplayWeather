@@ -99,27 +99,7 @@ layout = {                     // all "layout" attributes: #layout
     },
 
     annotations: [            // all "annotation" attributes: #layout-annotations
-        {
-            text: 'Rain',     // #layout-annotations-text
-            x:    '2015-09-16 12:09',    // #layout-annotations-x
-            xref: 'x',        // #layout-annotations-xref
-            y:    898.2,      // #layout-annotations-y
-            yref: 'y2'        // #layout-annotations-yref
-        },
-        {
-            text: 'Moved Outside',     // #layout-annotations-text
-            x:    '2015-10-07 11:15',    // #layout-annotations-x
-            xref: 'x',        // #layout-annotations-xref
-            y:    29.3,      // #layout-annotations-y
-            yref: ''        // #layout-annotations-yref
-        },
-        {
-            text: 'Fixed wiring',     // #layout-annotations-text
-            x:    '2015-10-14 3:28',    // #layout-annotations-x
-            xref: 'x',        // #layout-annotations-xref
-            y:    904.1,      // #layout-annotations-y
-            yref: 'y2'        // #layout-annotations-yref
-        }
+        
 
     ]
 
@@ -191,7 +171,7 @@ $(document).ready(function() {
 	$("#refreshPlot").click(function() {
 		console.log("Button is clicked");
 		var jsonData = $.ajax({
-		  url: server + 'output/' + public_key + '/latest.json',
+		  url: server + 'output/' + public_key + '/latest.json',	//'latest' referred from https://github.com/sparkfun/phant/pull/85
 		  dataType: 'jsonp',
 		}).done(function (results) {
 		    console.log(JSON.stringify(results));
