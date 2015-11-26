@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<!-- saved from url=(0042)http://10.8.7.185/weather/plotWeather.html -->
+<html class="splash">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Office Weather</title>
+		<link rel="stylesheet" type="text/css" href="view.css" media="all">
+		<script type="text/javascript" src="view.js"></script>
+		<script type="text/javascript" src="calendar.js"></script>
+		<!--
+		https://plot.ly/javascript/reference
+		Plotly prefers Open Sans, which can be included via the link below. But if
+		you cannot or do not want to access external resources, we fall back on
+		Verdana or Arial. You can specify any other font via layout.font.family.
+		-->
+		<!--<link href="https://fonts.googleapis.com/css?family=Open+Sans:600,400,300" rel="stylesheet" type="text/css">-->
+	<style></style></head>
+	<body>
+		<h3>Weather in Mark's Office</h3>
+        <h4 id="loadingMsg" >Loading Temperature and Pressure data. It may take upto 30 seconds...</h4>
+		<!--
+		Plots go in blank <div> elements. You can size them in the plot layout,
+					or give the div a size as shown here.
+			-->
+			<!--<div id="plot" style="width:600px;height:400px;"></div>-->
+			<div id="summary"></div>
+			<div id="plot"> </div>
+			<div id="experiment">
+			    <button id="refreshPlot">Refresh Plot</button>
+			    <button id="annotations">Turn on annotations</button>
+			    <button id="weatherRange24Hours">Past 24 hours weather</button>
+			    <button id="weatherRange7Days">Past 7 days weather</button>
+			    <button id="weatherRange1Month">Past 1 month weather</button>
+			    <br />
+                <p><a href="./OfficeWeatherHumidityTemp.html">View Humidity and Temperature Plot</a></p>
+                <br />
+                <button id="addAnnotations">Add annotions</button>
+			    <div id="annotationsForm" style="display:none">
+			        <img id="top" src="top.png" alt="">
+			        <div id="form_container">
+			            <h1><a>Add Annotation to data</a></h1>
+			            <form id="form_1076178" class="appnitro" action="javascript:void(0);">
+			                <div class="form_description">
+			                    <h2>Add Annotation to data</h2>
+			                    <p>The added annotation will appear everywhere to whomsoever views this website.</p>
+			                </div>
+			                <ul>
+			                    <li id="li_1">
+			                        <label class="description" for="element_1">Annotation Name </label>
+			                        <div>
+			                            <input id="element_1" name="element_1" class="element text medium" type="text" maxlength="255" value="" />
+			                        </div>
+			                    </li>
+			                    <li id="li_2">
+			                        <label class="description" for="element_2">Date </label>
+			                        <span>
+												<input id="element_2_1" name="element_2_1" class="element text" size="2" maxlength="2" value="" type="text"> /
+												<label for="element_2_1">DD</label>
+											</span>
+			                        <span>
+												<input id="element_2_2" name="element_2_2" class="element text" size="2" maxlength="2" value="" type="text"> /
+												<label for="element_2_2">MM</label>
+											</span>
+			                        <span>
+												<input id="element_2_3" name="element_2_3" class="element text" size="4" maxlength="4" value="" type="text">
+												<label for="element_2_3">YYYY</label>
+											</span>
+
+			                        <span id="calendar_2">
+												<img id="cal_img_2" class="datepicker" src="calendar.gif" alt="Pick a date.">
+											</span>
+			                        <script type="text/javascript">
+			                            Calendar.setup({
+			                                inputField: "element_2_3",
+			                                baseField: "element_2",
+			                                displayArea: "calendar_2",
+			                                button: "cal_img_2",
+			                                ifFormat: "%B %e, %Y",
+			                                onSelect: selectEuropeDate
+			                            });
+			                        </script>
+			                        <p class="guidelines" id="guide_2"><small>Date on which this annotation should appear.</small>
+			                        </p>
+			                    </li>
+			                    <li id="li_3">
+			                        <label class="description" for="element_3">Time </label>
+			                        <span>
+											<input id="element_3_1" name="element_3_1" class="element text " size="2" type="text" maxlength="2" value=""/> :
+											<label>HH</label>
+										</span>
+			                        <span>
+											<input id="element_3_2" name="element_3_2" class="element text " size="2" type="text" maxlength="2" value=""/> 
+											<label>MM</label>
+										</span>
+			                     
+			                        <p class="guidelines" id="guide_3"><small>Time on the above date on which this annotation should appear</small>
+			                        </p>
+			                    </li>
+			                    <li id="li_4">
+			                        <label class="description" for="element_4">Temp/Pressure </label>
+			                        <div>
+			                            <input id="element_4" name="element_4" class="element text medium" type="text" maxlength="255" value="" />
+			                        </div>
+			                        <p class="guidelines" id="guide_4"><small>Temperature or pressure value to which this annotation will be annotated. (Refer plot)</small>
+			                        </p>
+			                    </li>
+			                    <li id="li_5">
+			                        <label class="description" for="element_5">Annotate to </label>
+			                        <span>
+											<input id="element_5_1" name="element_5" class="element radio" type="radio" value="1" />
+											<label class="choice" for="element_5_1">Temperature</label>
+											<input id="element_5_2" name="element_5" class="element radio" type="radio" value="2" />
+											<label class="choice" for="element_5_2">Pressure</label>
+											<input id="element_5_3" name="element_5" class="element radio" type="radio" value="3" />
+											<label class="choice" for="element_5_3">Either</label>
+										</span>
+			                    </li>
+
+			                    <li class="buttons">
+			                        <input id="submitAnnotations" class="button_text" type="submit" name="submit" value="Submit" />
+			                    </li>
+			                </ul>
+			            </form>
+			        </div>
+			        <!--Form container div-->
+			    </div>
+			    <!--Annotations form div-->
+			</div>
+			<!--Experiment div-->
+            <div>
+                <p id="submitResult"></p>
+            </div>
+            <div>
+                <p id="report" style="visibility:hidden">Latest data not coming. <A HREF="mailto:weatheradmin@iitmandi.ac.in?CC=gopalkriagg@gmail.com&Subject=Server%20is%20not%20sending%20latest%20weather%20data&Body=Hi%21%0AIt%20seems%20that%20the%20weather%20server%20is%20not%20sending%20latest%20data.%20Could%20you%20fix%20it%3F">Report it.</A></p>
+            </div>
+	<!--
+	Include these javascript files.
+	d3: v3 is recommended
+	jQuery: plotly.js ships with v1.8 but supports v1.7 through v1.10
+	the weird typedarray.js code is a polyfill, primarily for IE9, that does not
+	natively support typed numeric arrays
+	-->
+	<script type="text/javascript" src="./Office Weather_files/d3.v3.min.js"></script>
+	<script type="text/javascript" src="./Office Weather_files/jquery-latest.js"></script>
+	<script>if(typeof window.Int16Array !== 'function')document.write("<scri"+"pt src='dependencies/typedarray.js'></scr"+"ipt>");</script>
+	<script type="text/javascript" src="./Office Weather_files/plotly.min.js"></script>
+	<script type="text/javascript" src="./Office Weather_files/underscore.min.js"></script>
+	<!--
+	Use these for remote servers
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>
+	-->
+	<!--
+	And then you are ready to make plots!
+	-->
+	<script>
+    // These are placeholders until we get the data from the server.
+    data = [{ // Temperature axis
+        "type": "scatter", // all "scatter" attributes: https://plot.ly/javascript/reference/#scatter
+        "x": [1, 2, 3],
+        "y": [3, 1, 6],
+        "marker": {
+            "color": "rgb(200, 32, 77)",
+            size: 3
+        },
+        connectgaps: false,
+        mode: 'markers',
+        name: 'Temp'
+    }, { // Pressure axis
+        "type": "scatter",
+        "x": [1, 2, 3],
+        "y": [3, 1, 6],
+        "marker": {
+            "color": "rgb(16, 200, 77)",
+            size: 3
+        },
+        connectgaps: false,
+        mode: 'markers',
+        name: 'Pressure',
+        yaxis: 'y2'
+    }];
+    layout = { // all "layout" attributes: #layout
+        "title": "Weather",
+        "xaxis": { // all "layout.xaxis" attributes: #layout-xaxis
+            "title": "Date" // more about "layout.xaxis.title": #layout-xaxis-title
+        },
+        yaxis: {
+            title: 'Temperature (C)',
+            titlefont: {
+                color: 'rgb(255, 32, 77)'
+            },
+        },
+        yaxis2: {
+            title: 'Pressure',
+            titlefont: {
+                color: 'rgb(16, 255, 77)'
+            },
+            tickfont: {
+                color: 'rgb(148, 103, 189)'
+            },
+            overlaying: 'y',
+            side: 'right'
+        }
+        //Moved annotations to a separate file
+    }
+    var server = 'http://14.139.34.32:8080/';
+    var public_key = 'v02NOaq1KKhpYLJqJ9EWFq1N8QqE';
+    var annotationsPublicKey = 'mQ62PN9y4yfrqooZ8goDuaXzdjM';
+    // var timezone = '?timezone=Asia/Calcutta';
+    function fetchAnnotations() {
+        var jsonDataAnnotations = $.ajax({
+            url: server + 'output/' + annotationsPublicKey + '.json',
+            dataType: 'jsonp',
+        }).done(function(results) {
+            //          console.log("Fetched data from prof's server: " + JSON.stringify(results));
+            for (var i = results.length - 1; i >= 0; i--) {
+                delete results[i].timestamp;
+            };
+            console.log("Fetched data from prof's server after deleting timestamps: " + JSON.stringify(results));
+            layout.annotations = results;
+            console.log("Fetched Annotations are: ");
+            console.log(layout);
+        });    
+    }
+    fetchAnnotations();
+    
+    /*$.get("http://10.8.7.44/annotations", function(response) { //Hosted on my localhost Needed to install CORS extension on chrome
+    var annotations = jQuery.parseJSON(response);
+    console.log("Loaded file: " + response);
+    layout.annotations = annotations;
+    console.log(layout);
+    });
+    */
+    // JSONP request
+    var annotations;
+
+    function doneOutside(results) {
+        //		    console.log(results);
+        /*		    var i;
+			for(i=0; i<5; i++) {
+			console.log(results[i]);
+			}
+							*/
+        $("#loadingMsg").css("display", "none");
+        console.log("Replacing div id plot");
+        $("#plot").replaceWith('<div id="plot"> </div>');
+        console.log("Replaced div id plot");
+        data[0].x = _.map(results, function(item) {
+            timestamp = item.timestamp.replace('T', ' ').replace('Z', ''); // Convert to Plotly time format
+            //		            console.log("Inside _.map and timestamp is " + timestamp);
+            var targetTime = new Date(timestamp);
+            var tzDifference = targetTime.getTimezoneOffset();
+            var offsetTime = new Date(targetTime.getTime() - tzDifference * 60 * 1000);
+            //		            console.log("Returning new Offset Time which is: " + offsetTime);
+            return offsetTime;
+        });
+        data[1].x = data[0].x; // Both plots have same time scale
+        data[0].y = _.map(results, function(item) { // Copy temp data
+            if (item.temp < 50) {
+                return item.temp;
+            } else {
+                return NaN;
+            }
+        });
+        data[1].y = _.map(results, function(item) { // Copy pressure data
+            if (item.pressure > 880 && item.pressure < 920) {
+                return item.pressure;
+            } else {
+                return NaN;
+            }
+        });
+        annotations = layout.annotations;
+        delete layout.annotations;
+        Plotly.plot('plot', data, layout); // Puts plot in <div> with id='plot'
+        $('#summary').html('Temp: ' + data[0].y[0] + '(C), Pressure: ' + data[1].y[0] +
+            ' at ' + data[0].x[0]);
+        var latestDataTime = data[0].x[0];
+        var refTime = new Date();
+        var timeDiff = Math.abs(latestDataTime.getTime() - refTime.getTime());
+        console.log("Time diff in data is " + timeDiff);
+        if(timeDiff > 1 * 60 * 60 * 1000) {
+            console.log("Latest Data is not coming!");
+            $("#report").css("visibility", "visible");
+        }
+        else {
+            console.log("Receiving latest data with a gap of minutes: " + timeDiff/(1000*60));
+            $("#report").css("visibility", "hidden");
+        }
+    }
+    var currentPlottedRange = "1Month";
+
+    function AjaxRequest() {
+        $("#loadingMsg").css("display", "");
+        var jsonData = $.ajax({
+            // url: 'http://14.139.34.32:8080/output/' + public_key + '.json' + timezone,
+            url: server + 'output/' + public_key + '.json?gt[timestamp]=now%20-1month', //Gets past 1 months data by default (now -30day)
+            //		  data: {page : 1},
+            dataType: 'jsonp',
+            timeout : 10000,
+            error: function(xhr, textStatus, errorThrown){
+                        alert('There is something connecting with server.');
+                        $("#report").css("visibility", "visible");
+                    }
+        }).done(function(results) {
+            doneOutside(results);
+        });
+    }
+    AjaxRequest();
+    $(document).ready(function() {
+        /*$("#refreshPlot").click(function() {
+										//		console.log("Button is clicked");
+												AjaxRequest();		//Verified. It really updates the plot and the data at the top
+					});
+				*/
+        $("#refreshPlot").click(function() {
+            console.log("Button is clicked");
+            fetchAnnotations();
+            var jsonData = $.ajax({
+                url: server + 'output/' + public_key + '/latest.json', //'latest' referred from https://github.com/sparkfun/phant/pull/85
+                dataType: 'jsonp',
+            }).done(function(results) {
+                console.log(JSON.stringify(results));
+                var timestamp = results[0].timestamp.replace('T', ' ').replace('Z', ''); // Convert to Plotly time format
+                var targetTime = new Date(timestamp);
+                var tzDifference = targetTime.getTimezoneOffset();
+                var offsetTime = new Date(targetTime.getTime() - tzDifference * 60 * 1000);
+                if (offsetTime > data[0].x[0]) {
+                    console.log("Replacing div id plot");
+                    $("#plot").replaceWith('<div id="plot"> </div>');
+                    console.log("Replaced div id plot");
+                    console.log("New data plotting");
+                    data[0].x.unshift(offsetTime);
+                    data[1].x.unshift(offsetTime);
+                    data[0].y.unshift(results[0].temp);
+                    data[1].y.unshift(results[0].pressure);
+                    Plotly.plot('plot', data, layout); // Puts plot in <div> with id='plot'
+                    $('#summary').html('Temp: ' + data[0].y[0] + '(C), Pressure: ' + data[1].y[0] +
+                        ' at ' + data[0].x[0]);
+                } else {
+                    console.log("New data fetched is not new");
+                }
+            });
+
+        });
+        var flag = 1;
+        $("#annotations").click(function() {
+            if (flag == 0) {
+                //Turning off annotations:
+                flag = 1;
+                delete layout.annotations;
+                console.log(layout);
+                $(this).text("Turn on annotations");
+            } else {
+                //Turning on annotations:
+                flag = 0;
+                layout.annotations = annotations;
+                console.log(layout);
+                $(this).text("Turn off annotations");
+            }
+            console.log("Replacing div id plot");
+            $("#plot").replaceWith('<div id="plot"> </div>');
+            console.log("Replaced div id plot");
+            switch (currentPlottedRange) {
+                case "1Month":
+                    console.log("Hit 1 Month");
+                    $("#weatherRange1Month").trigger("click");
+                    break;
+                case "7Days":
+                    console.log("Hit 7 days");
+                    $("#weatherRange7Days").trigger("click");
+                    break;
+                case "24Hours":
+                    console.log("Hit 24 Hours");
+                    $("#weatherRange24Hours").trigger("click");
+                    break;
+                default:
+                    console.log("No case matched!");
+                    break;
+            }
+        })
+        $("#weatherRange7Days").click(function() {
+            //var newData = data.slice();
+            var newData = JSON.parse(JSON.stringify(data));
+            delete newData[0].x;
+            delete newData[0].y;
+            delete newData[1].x;
+            delete newData[1].y;
+            newData[0].x = [];
+            newData[0].y = [];
+            newData[1].x = [];
+            newData[1].y = [];
+            console.log(data[0].x);
+            var refTime = new Date();
+            refTime.setDate(refTime.getDate() - 7);
+            console.log("Reference Date is : " + refTime);
+            var x = Date.parse(refTime);
+            var j = 0;
+            for (var i = data[0].x.length - 1; i >= 0; i--) {
+                if (Date.parse(data[0].x[i]) >= x) {
+                    newData[0].x[j] = data[0].x[i];
+                    newData[0].y[j] = data[0].y[i];
+                    newData[1].x[j] = data[1].x[i];
+                    newData[1].y[j] = data[1].y[i];
+                    j++;
+                }
+            };
+            console.log("Replacing div id plot");
+            $("#plot").replaceWith('<div id="plot"> </div>');
+            console.log("Replaced div id plot");
+            Plotly.plot('plot', newData, layout); // Puts plot in <div> with id='plot'
+            currentPlottedRange = "7Days";
+        })
+        $("#weatherRange24Hours").click(function() {
+            //var newData = data.slice();
+            var newData = JSON.parse(JSON.stringify(data));
+            delete newData[0].x;
+            delete newData[0].y;
+            delete newData[1].x;
+            delete newData[1].y;
+            newData[0].x = [];
+            newData[0].y = [];
+            newData[1].x = [];
+            newData[1].y = [];
+            console.log(data[0].x);
+            var refTime = new Date();
+            refTime.setDate(refTime.getDate() - 1);
+            console.log("Reference Date is : " + refTime);
+            var x = Date.parse(refTime);
+            var j = 0;
+            for (var i = data[0].x.length - 1; i >= 0; i--) {
+                if (Date.parse(data[0].x[i]) >= x) {
+                    newData[0].x[j] = data[0].x[i];
+                    newData[0].y[j] = data[0].y[i];
+                    newData[1].x[j] = data[1].x[i];
+                    newData[1].y[j] = data[1].y[i];
+                    j++;
+                }
+            };
+            console.log("Replacing div id plot");
+            $("#plot").replaceWith('<div id="plot"> </div>');
+            console.log("Replaced div id plot");
+            Plotly.plot('plot', newData, layout); // Puts plot in <div> with id='plot'
+            currentPlottedRange = "24Hours";
+        })
+        $("#weatherRange1Month").click(function() {
+            console.log("Replacing div id plot");
+            $("#plot").replaceWith('<div id="plot"> </div>');
+            console.log("Replaced div id plot");
+            Plotly.plot('plot', data, layout); // Puts plot in <div> with id='plot'
+            currentPlottedRange = "1Month";
+        })
+        $("#submitAnnotations").click(function() {
+        	var annotationName = $("#element_1").val();
+        	var DD = $("#element_2_1").val();
+        	var MM = $("#element_2_2").val();
+        	var YYYY = $("#element_2_3").val();
+        	var HH = $("#element_3_1").val();
+        	var MinMin = $("#element_3_2").val();
+        	var annotateToValue = $("#element_4").val();
+            var radio;
+            if($('#element_5_1').is(':checked'))
+                radio = "y1"; //Axis corresponds to Temperature
+            if($('#element_5_2').is(':checked'))
+                radio = "y2"; //Axis corresponds to Pressure.
+            if($('#element_5_3').is(':checked'))
+                radio = "";
+            console.log(annotationName);
+            console.log(DD);
+            console.log(MM);
+            console.log(YYYY);
+            console.log(HH);
+            console.log(MinMin);
+            console.log(annotateToValue);
+            console.log(radio);
+            var url = 
+             "http://14.139.34.32:8080/input/mQ62PN9y4yfrqooZ8goDuaXzdjM?private_key=j3VvegqXAXhDlaan8vaXS83EbNj&text="
+             + annotationName 
+             + "&x="
+             + YYYY + "-" + MM + "-" + DD + " "
+             + HH + ":" + MinMin
+             + "&xref=x&y="
+             + annotateToValue
+             + "&yref="
+             + radio;
+             console.log(url);
+             url = '<object data="' + url + '" />';
+             console.log(url);
+             $("#submitResult").html(url);
+        })
+        var annotationsFormVisible = 0;
+        $("#addAnnotations").click(function() {
+            $("#annotationsForm").slideToggle();
+            if(annotationsFormVisible) {
+                $(this).text("Add annotations");
+                annotationsFormVisible = 0;
+            }
+            else {
+                $(this).text("Hide Annotations Form");
+                annotationsFormVisible = 1;
+            }
+        })
+
+    })
+</script>
+
+						<div id="point-jawn" style="z-index: 999;"></div><svg id="js-plotly-tester" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position: absolute; left: -10000px; top: -10000px; width: 9000px; height: 9000px;"><path class="js-reference-point" d="M0,0H1V1H0Z" style="stroke-width: 0px; fill: black;"></path></svg></body></html>
